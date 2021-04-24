@@ -23,6 +23,7 @@ import {
 } from "./Main_Styles";
 import HashLoader from "react-spinners/HashLoader";
 import { useHistory } from "react-router-dom";
+import Notification from "../Notification/Notification";
 
 function Main() {
 	const [notes, setNotes] = useState(undefined);
@@ -32,12 +33,14 @@ function Main() {
 	const [noteAction, setNoteAction] = useState("Add");
 	const [selectedNoteId, setSelectedNoteId] = useState(undefined);
 	const [loading, setLoading] = useState(false);
+	const [showNotification, setShowNotification] = useState(false);
+	const [notificationMessage, setNotificationMessage] = useState(undefined);
 	const history = useHistory();
 
 	useEffect(() => {
 		setLoading(true);
 		axios
-			.get("https://task-manager-api-mongodb.herokuapp.com/", {
+			.get("http://localhost:8080/", {
 				headers: {
 					Authorization: "Bearer " + sessionStorage.getItem("token"),
 				},
@@ -53,7 +56,8 @@ function Main() {
 			})
 			.catch((err) => {
 				if (err.response.status === 401) {
-					return alert("Not authenticated, please login.");
+					setNotificationMessage("Not authenticated, please login!");
+					return setShowNotification(true);
 				}
 			});
 		// eslint-disable-next-line
@@ -61,7 +65,7 @@ function Main() {
 
 	const deleteNote = (noteId) => {
 		axios
-			.delete("https://task-manager-api-mongodb.herokuapp.com/delete-todo", {
+			.delete("http://localhost:8080/delete-todo", {
 				data: {
 					noteId,
 				},
@@ -72,14 +76,17 @@ function Main() {
 			.then((result) => {
 				setNewNote(!newNote);
 			})
-			.catch((err) => alert("Deleting note failed!"));
+			.catch((err) => {
+				setNotificationMessage("Deleting note failed!");
+				return setShowNotification(true);
+			});
 	};
 
 	const addNote = () => {
 		setLoading(true);
 		axios
 			.post(
-				"https://task-manager-api-mongodb.herokuapp.com/addtodo",
+				"http://localhost:8080/addtodo",
 				{ noteContent: quillValue.toString() },
 				{
 					headers: {
@@ -92,13 +99,16 @@ function Main() {
 				setNewNote(!newNote);
 				return setLoading(false);
 			})
-			.catch((err) => alert("Adding note failed!"));
+			.catch((err) => {
+				setNotificationMessage("Adding note failed!");
+				return setShowNotification(true);
+			});
 	};
 
 	const editNote = (noteId) => {
 		axios
 			.patch(
-				"https://task-manager-api-mongodb.herokuapp.com/update-todo",
+				"http://localhost:8080/update-todo",
 				{ noteContent: quillValue.toString(), noteId: noteId },
 				{
 					headers: {
@@ -109,7 +119,10 @@ function Main() {
 			.then((response) => {
 				setNewNote(!newNote);
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => {
+				setNotificationMessage("Editing note failed!");
+				return setShowNotification(true);
+			});
 	};
 
 	const handleChange = (value) => {
@@ -230,6 +243,7 @@ function Main() {
 					}}
 				/>
 			</RightContainer>
+			{showNotification && (<Notification message={notificationMessage} setShowNotification={setShowNotification} />)}
 		</MainContainer>
 	);
 }
