@@ -40,7 +40,7 @@ function Main() {
 	useEffect(() => {
 		setLoading(true);
 		axios
-			.get("https://task-manager-rest-api-mongodb.herokuapp.com/", {
+			.get(`${process.env.REACT_APP_URL_API}`, {
 				headers: {
 					Authorization: "Bearer " + sessionStorage.getItem("token"),
 				},
@@ -65,7 +65,7 @@ function Main() {
 
 	const deleteNote = (noteId) => {
 		axios
-			.delete("https://task-manager-rest-api-mongodb.herokuapp.com/delete-todo", {
+			.delete(`${process.env.REACT_APP_URL_API}/delete-todo`, {
 				data: {
 					noteId,
 				},
@@ -86,7 +86,7 @@ function Main() {
 		setLoading(true);
 		axios
 			.post(
-				"https://task-manager-rest-api-mongodb.herokuapp.com/addtodo",
+				`${process.env.REACT_APP_URL_API}/addtodo`,
 				{ noteContent: quillValue.toString() },
 				{
 					headers: {
@@ -108,7 +108,7 @@ function Main() {
 	const editNote = (noteId) => {
 		axios
 			.patch(
-				"https://task-manager-rest-api-mongodb.herokuapp.com/update-todo",
+				`${process.env.REACT_APP_URL_API}/update-todo`,
 				{ noteContent: quillValue.toString(), noteId: noteId },
 				{
 					headers: {

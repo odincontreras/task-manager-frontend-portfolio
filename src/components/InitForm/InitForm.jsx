@@ -58,7 +58,7 @@ function InitForm() {
 		}
 		setShowBackdrop(true);
 		axios
-			.post("https://task-manager-rest-api-mongodb.herokuapp.com/signin", signInFormInputs)
+			.post(`${process.env.REACT_APP_URL_API}/signin`, signInFormInputs)
 			.then((response) => {
 				setShowBackdrop(false);
 				setShowLoginForm(true);
@@ -79,7 +79,7 @@ function InitForm() {
 		event.preventDefault();
 		setShowBackdrop(true);
 		axios
-			.post("https://task-manager-rest-api-mongodb.herokuapp.com/login", logInFormInputs)
+			.post(`${process.env.REACT_APP_URL_API}/login`, logInFormInputs)
 			.then((response) => {
 				if (response.status === 200) {
 					setShowBackdrop(false);
@@ -87,7 +87,18 @@ function InitForm() {
 					history.push({ pathname: "/main" });
 				}
 			})
-			.catch((err) => console.log(err.response.data.message));
+			.catch((err) => {
+				setShowBackdrop(false);
+				if(err.response.data.message === "Wrong password, try again.") {
+					setNotificationMessage(err.response.data.message);
+					return setShowNotification(true);
+				} else if(err.response.data.message === "A user with this email could not be found.") {
+					setNotificationMessage(err.response.data.message);
+					return setShowNotification(true);
+				} else {
+					console.log(err)
+				}
+			});
 	};
 
 	return (
